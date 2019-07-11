@@ -1,4 +1,5 @@
 #pragma once
+#pragma warning(disable:4267)
 #include <string>
 #include <vector>
 class MyString :public std::string
@@ -61,6 +62,10 @@ public:
 	//target 需要清除的字符默认空格
 	MyString Trim(char target = ' ')
 	{
+		if (size()==1||size()==0)
+		{
+			return *this;
+		}
 		auto left = find_first_not_of(target);
 		auto right = find_last_not_of(target);
 		return substr(left, right - left + 1);
