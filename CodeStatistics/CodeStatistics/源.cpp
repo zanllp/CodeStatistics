@@ -48,8 +48,9 @@ bool CheckIgnore(MyString file_name)
 	file_name.Replace("\\*", "");
 	for (auto& i : ConfVec(ignore_dir))
 	{
-		if (file_name == i)
+		if (file_name==i)
 		{
+			
 			return false;
 		}
 	}
@@ -64,7 +65,7 @@ bool CheckLang(MyString file_name)
 		return false;
 	}
 	MyString suffix = name_split[1];
-	for (auto& i : ConfVec(ignore_dir))
+	for (auto& i : ConfVec(lang))
 	{
 		if (suffix == i)
 		{
@@ -155,6 +156,8 @@ int main()
 		return 0;
 	}
 	InitConf();
+
+
 	function<void(MyString)> Find = [&](MyString filename)
 	{
 		_finddata_t file_info;
@@ -191,7 +194,7 @@ int main()
 		}
 		_findclose(handle);
 	};
-	for (auto x : ConfVec(ignore_dir))
+	for (auto x : ConfVec(dir))
 	{
 		if (ConfBool(detail))
 		{
