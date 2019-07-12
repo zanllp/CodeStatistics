@@ -14,24 +14,24 @@
 	show_detail = true
 	dir_0 = C:\Users\w1598\Desktop\ioflow.link
 	dir_1 = C:\Users\w1598\source\repos
-	dir_2 = C:\Users\w1598\Desktop\ioflow.link\Ç°¶Ë\Ioflow.link-console\node_modules
-	dir_3 = C:\Users\w1598\Desktop\ioflow.link\ºó¶Ë\Ioflow.link-backend\node_modules
+	dir_2 = C:\Users\w1598\Desktop\ioflow.link\Ç°ï¿½ï¿½\Ioflow.link-console\node_modules
+	dir_3 = C:\Users\w1598\Desktop\ioflow.link\ï¿½ï¿½ï¿½\Ioflow.link-backend\node_modules
 */
 
 using namespace std;
 
-map<MyString, MyString> conf;//µÈÓÚºÅ×óÓÒµÄ¼üÖµ¶Ô
-map<MyString, vector<MyString>> conf_vec;//µÈÓÚºÅ×ó±ßµÄ¼ü¼°ÓÒ±ß½âÎöºÃÖµµÄÏòÁ¿£¬½öÊýÖµÀàÐÍ
+map<MyString, MyString> conf;//ï¿½ï¿½ï¿½Úºï¿½ï¿½ï¿½ï¿½ÒµÄ¼ï¿½Öµï¿½ï¿½
+map<MyString, vector<MyString>> conf_vec;//ï¿½ï¿½ï¿½Úºï¿½ï¿½ï¿½ßµÄ¼ï¿½ï¿½ï¿½ï¿½Ò±ß½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½
 MyString conf_str;
-const MyString lang = "lang_suffix"; // Êý×é
-const MyString dir = "scand_dir";	//Êý×é
-const MyString ignore_dir = "ignore_dir";	//Êý×é
-const MyString detail = "show_detail";// ²¼¶û
-const vector<MyString> value_vec = { lang,dir,ignore_dir };//Êý×éÖµÌí¼Óµ½ÕâÀï¾ÍÄÜ×Ô¼º½âÎö
+const MyString lang = "lang_suffix"; // ï¿½ï¿½ï¿½ï¿½
+const MyString dir = "scand_dir";	//ï¿½ï¿½ï¿½ï¿½
+const MyString ignore_dir = "ignore_dir";	//ï¿½ï¿½ï¿½ï¿½
+const MyString detail = "show_detail";// ï¿½ï¿½ï¿½ï¿½
+const vector<MyString> value_vec = { lang,dir,ignore_dir };//ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½
 
-MyString lang_now;// µ±Ç°ÓïÑÔ
-map<MyString, long> lang_num;// ¸÷¸öÓïÑÔµÄÊýÁ¿
-int all_num = 0;// ×ÜÊý
+MyString lang_now;// ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½
+map<MyString, long> lang_num;// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôµï¿½ï¿½ï¿½ï¿½ï¿½
+int all_num = 0;// ï¿½ï¿½ï¿½ï¿½
 
 bool ConfBool(MyString key)
 {
@@ -132,7 +132,7 @@ int ReadConfFile()
 			<< dir << " = " << endl
 			<< ignore_dir << " = " << endl
 			<< detail << " = true";
-		cout << "ÕÒ²»µ½ÅäÖÃÎÄ¼þ£¬ÒÑÐÂ½¨Ò»¸ö£¬ÏÈ½øÐÐÅäÖÃ" << endl;
+		cout << "ï¿½Ò²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½È½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" << endl;
 		return -1;
 	}
 	while (conf_file.good())
