@@ -9,7 +9,7 @@
 /*
 	// conf.ini
 	lang_suffix = js | jsx | ts | tsx | html | css | cpp | h
-	scand_dir = $dir_0 | C:\Users\w1598\source\repos
+	scand_dir = $dir_0 | $dir_1
 	ignore_dir = $dir_2 | $dir_3
 	show_detail = true
 	dir_0 = C:\Users\w1598\Desktop\ioflow.link
@@ -25,10 +25,13 @@ vector<MyString> ignore_dir;
 map<MyString, MyString> conf;
 
 MyString conf_str;
-MyString lang = "lang_suffix";
-MyString dir = "scand_dir";
-MyString ignore_ = "ignore_dir";
-MyString detail = "show_detail";
+const MyString lang = "lang_suffix";
+const MyString dir = "scand_dir";
+const MyString ignore_ = "ignore_dir";
+const MyString detail = "show_detail";
+
+MyString lang_now;
+map<MyString, long> lang_num;
 int all_num = 0;
 
 bool ShowDetail()
@@ -61,6 +64,7 @@ bool CheckLang(MyString file_name)
 	{
 		if (suffix == i)
 		{
+			lang_now = i;
 			return true;
 		}
 	}
@@ -78,6 +82,7 @@ void CalcLineNum(MyString file_name)
 		code += MyString(&rbq.at(0)) + "\n";
 	}
 	auto num = code.FindAll("\n").size();
+	lang_num[lang_now] += num;
 	all_num += num;
 	if (ShowDetail())
 	{
@@ -122,10 +127,6 @@ void InitConf()
 			ignore_dir.push_back(x);
 		}
 	}
-	for (auto& i : ignore_dir)
-	{
-		cout << i << endl;
-	}
 }
 
 int ReadConfFile()
@@ -150,6 +151,11 @@ int ReadConfFile()
 	}
 }
 
+void CoutLine()
+{
+	cout << "-----------------------------------------------------------------------------------------------" << endl;
+}
+
 int main()
 {
 	if (ReadConfFile() == -1)
@@ -164,26 +170,30 @@ int main()
 		auto handle = _findfirst(filename.c_str(), &file_info);
 		while (handle != -1)
 		{
-			if (file_info.name[0] != '.')
+			if (file_info.name[0] == '.')
 			{
-				if (file_info.attrib == 16)
+				if (_findnext(handle, &file_info) == -1)
 				{
-					MyString sub_dir = filename;
-					sub_dir.Replace("*", MyString(file_info.name) + "\\*");
-					if (CheckIgnore(sub_dir))
-					{
-						Find(sub_dir);
-					}
+					break;
 				}
-				else if (CheckLang(file_info.name))
+				continue;
+			}
+			if (file_info.attrib == 16)
+			{
+				MyString sub_dir = filename;
+				sub_dir.Replace("*", MyString(file_info.name) + "\\*");
+				if (CheckIgnore(sub_dir))
 				{
-					MyString code_file = filename;
-					code_file.Replace("*", file_info.name);
-					CalcLineNum(code_file);
+					Find(sub_dir);
 				}
 			}
-			int status = _findnext(handle, &file_info);
-			if (status == -1)
+			else if (CheckLang(file_info.name))
+			{
+				MyString code_file = filename;
+				code_file.Replace("*", file_info.name);
+				CalcLineNum(code_file);
+			}
+			if( _findnext(handle, &file_info) == -1)
 			{
 				break;
 			}
@@ -194,13 +204,18 @@ int main()
 	{
 		if (ShowDetail())
 		{
-			cout << "-----------------------------------------------------------------------------------------------" << endl;
+			CoutLine();
 			cout << x << endl;
-			cout << "-----------------------------------------------------------------------------------------------" << endl;
+			CoutLine();
 		}
 		x += "\\*";
 		Find(x.c_str());
 	}
-	cout << all_num << endl;
+	CoutLine();
+	for (auto& i : lang_num)
+	{
+		cout << i.first << "  " << i.second << endl;
+	}
+	cout <<"all    "<< all_num << endl;
 	system("pause");
 }
