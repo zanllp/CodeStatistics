@@ -19,32 +19,36 @@
 */
 
 using namespace std;
-vector<MyString> target_lang;
-vector<MyString> target_dir;
-vector<MyString> ignore_dir;
-map<MyString, MyString> conf;
 
+map<MyString, MyString> conf;//等于号左右的键值对
+map<MyString, vector<MyString>> conf_vec;//等于号左边的键及右边解析好值的向量，仅数值类型
 MyString conf_str;
-const MyString lang = "lang_suffix";
-const MyString dir = "scand_dir";
-const MyString ignore_ = "ignore_dir";
-const MyString detail = "show_detail";
+const MyString lang = "lang_suffix"; // 数组
+const MyString dir = "scand_dir";	//数组
+const MyString ignore_dir = "ignore_dir";	//数组
+const MyString detail = "show_detail";// 布尔
+const vector<MyString> value_vec = { lang,dir,ignore_dir };//数组值添加到这里就能自己解析
 
-MyString lang_now;
-map<MyString, long> lang_num;
-int all_num = 0;
+MyString lang_now;// 当前语言
+map<MyString, long> lang_num;// 各个语言的数量
+int all_num = 0;// 总数
 
-bool ShowDetail()
+bool ConfBool(MyString key)
 {
-	return conf[detail] == "true";
+	return conf[key] == "true";
+}
+
+vector<MyString> ConfVec(MyString key)
+{
+	return conf_vec[key];
 }
 
 bool CheckIgnore(MyString file_name)
 {
 	file_name.Replace("\\*", "");
-	for (auto& i : ignore_dir)
+	for (auto& i : ConfVec(ignore_dir))
 	{
-		if (file_name==i)
+		if (file_name == i)
 		{
 			return false;
 		}
@@ -60,7 +64,7 @@ bool CheckLang(MyString file_name)
 		return false;
 	}
 	MyString suffix = name_split[1];
-	for (auto& i : target_lang)
+	for (auto& i : ConfVec(ignore_dir))
 	{
 		if (suffix == i)
 		{
@@ -79,12 +83,12 @@ void CalcLineNum(MyString file_name)
 	{
 		array<char, 3000> rbq = { 0 };
 		code_file.read(&rbq.at(0), rbq.size() - 1);
-		code += MyString(&rbq.at(0)) + "\n";
+		code += MyString(&rbq.at(0));
 	}
 	auto num = code.FindAll("\n").size();
 	lang_num[lang_now] += num;
 	all_num += num;
-	if (ShowDetail())
+	if (ConfBool(detail))
 	{
 		cout << file_name << " " << num << endl;
 	}
@@ -99,32 +103,19 @@ void InitConf()
 		auto value = item.size() == 1 ? "" : item[1].Trim();
 		conf[propetry] = value;
 	}
-	for (auto x : conf[lang].Split("|"))
+	for (auto& i : value_vec)
 	{
-		target_lang.push_back(x.Trim());
-	}
-	for (auto x : conf[dir].Split("|"))
-	{
-		x = x.Trim();
-		if (x[0] == '$')
+		for (auto& x : conf[i].Split("|"))
 		{
-			target_dir.push_back(conf[x.substr(1)]);
-		}
-		else
-		{
-			target_dir.push_back(x);
-		}
-	}
-	for (auto x : conf[ignore_].Split("|"))
-	{
-		x = x.Trim();
-		if (x[0] == '$')
-		{
-			ignore_dir.push_back(conf[x.substr(1)]);
-		}
-		else
-		{
-			ignore_dir.push_back(x);
+			x = x.Trim();
+			if (x[0] == '$')
+			{
+				conf_vec[i].push_back(conf[x.substr(1)]);
+			}
+			else
+			{
+				conf_vec[i].push_back(x);
+			}
 		}
 	}
 }
@@ -138,7 +129,7 @@ int ReadConfFile()
 		create_new
 			<< lang << " = " << endl
 			<< dir << " = " << endl
-			<< ignore_ << " = " << endl
+			<< ignore_dir << " = " << endl
 			<< detail << " = true";
 		cout << "找不到配置文件，已新建一个，先进行配置" << endl;
 		return -1;
@@ -147,7 +138,7 @@ int ReadConfFile()
 	{
 		array<char, 300> rbq = { 0 };
 		conf_file.read(&rbq.at(0), rbq.size() - 1);
-		conf_str += MyString(&rbq.at(0)) ;
+		conf_str += MyString(&rbq.at(0));
 	}
 }
 
@@ -193,16 +184,16 @@ int main()
 				code_file.Replace("*", file_info.name);
 				CalcLineNum(code_file);
 			}
-			if( _findnext(handle, &file_info) == -1)
+			if (_findnext(handle, &file_info) == -1)
 			{
 				break;
 			}
 		}
 		_findclose(handle);
 	};
-	for (auto x : target_dir)
+	for (auto x : ConfVec(ignore_dir))
 	{
-		if (ShowDetail())
+		if (ConfBool(detail))
 		{
 			CoutLine();
 			cout << x << endl;
@@ -216,6 +207,6 @@ int main()
 	{
 		cout << i.first << "  " << i.second << endl;
 	}
-	cout <<"all    "<< all_num << endl;
+	cout << "all    " << all_num << endl;
 	system("pause");
 }
