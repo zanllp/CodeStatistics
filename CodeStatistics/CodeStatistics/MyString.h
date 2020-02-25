@@ -62,7 +62,7 @@ public:
 	//target 需要清除的字符默认空格
 	MyString Trim(char target = ' ')
 	{
-		if (size()==1||size()==0)
+		if (size() == 1 || size() == 0)
 		{
 			return *this;
 		}

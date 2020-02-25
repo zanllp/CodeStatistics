@@ -7,31 +7,32 @@
 #include "MyString.h"
 
 /*
-	// conf.ini
+	# conf.ini
 	lang_suffix = js | jsx | ts | tsx | html | css | cpp | h
 	scand_dir = $dir_0 | $dir_1
 	ignore_dir = $dir_2 | $dir_3
 	show_detail = true
-	dir_0 = C:\Users\w1598\Desktop\ioflow.link
+	dir_0 = C:\Users\w1598\Desktop\ioflow.link 
 	dir_1 = C:\Users\w1598\source\repos
-	dir_2 = C:\Users\w1598\Desktop\ioflow.link\Ç°ï¿½ï¿½\Ioflow.link-console\node_modules
-	dir_3 = C:\Users\w1598\Desktop\ioflow.link\ï¿½ï¿½ï¿½\Ioflow.link-backend\node_modules
+	dir_2 = C:\Users\w1598\Desktop\ioflow.link\Ç°¶Ë\Ioflow.link-console\node_modules
+	dir_3 = C:\Users\w1598\Desktop\ioflow.link\ºó¶Ë\Ioflow.link-backend\node_modules
 */
 
 using namespace std;
 
-map<MyString, MyString> conf;//ï¿½ï¿½ï¿½Úºï¿½ï¿½ï¿½ï¿½ÒµÄ¼ï¿½Öµï¿½ï¿½
-map<MyString, vector<MyString>> conf_vec;//ï¿½ï¿½ï¿½Úºï¿½ï¿½ï¿½ßµÄ¼ï¿½ï¿½ï¿½ï¿½Ò±ß½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½
+map<MyString, MyString> conf;//µÈÓÚºÅ×óÓÒµÄ¼üÖµ¶Ô
+map<MyString, vector<MyString>> conf_vec;//µÈÓÚºÅ×ó±ßµÄ¼ü¼°ÓÒ±ß½âÎöºÃÖµµÄÏòÁ¿£¬½öÊýÖµÀàÐÍ
 MyString conf_str;
-const MyString lang = "lang_suffix"; // ï¿½ï¿½ï¿½ï¿½
-const MyString dir = "scand_dir";	//ï¿½ï¿½ï¿½ï¿½
-const MyString ignore_dir = "ignore_dir";	//ï¿½ï¿½ï¿½ï¿½
-const MyString detail = "show_detail";// ï¿½ï¿½ï¿½ï¿½
-const vector<MyString> value_vec = { lang,dir,ignore_dir };//ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½
+const MyString lang = "lang_suffix"; // Êý×é
+const MyString dir = "scand_dir";	//Êý×é
+const MyString ignore_dir = "ignore_dir";	//Êý×é
+const MyString detail = "show_detail";// ²¼¶û
+const MyString export2file = "export";// µ¼³öµ½Ö¸¶¨ÎÄ¼þ
+const vector<MyString> value_vec = { lang,dir,ignore_dir };//Êý×éÖµÌí¼Óµ½ÕâÀï¾ÍÄÜ×Ô¼º½âÎö
 
-MyString lang_now;// ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½
-map<MyString, long> lang_num;// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôµï¿½ï¿½ï¿½ï¿½ï¿½
-int all_num = 0;// ï¿½ï¿½ï¿½ï¿½
+MyString lang_now;// µ±Ç°ÓïÑÔ
+map<MyString, long> lang_num;// ¸÷¸öÓïÑÔµÄÊýÁ¿
+int all_num = 0;// ×ÜÊý
 
 bool ConfBool(MyString key)
 {
@@ -48,9 +49,8 @@ bool CheckIgnore(MyString file_name)
 	file_name.Replace("\\*", "");
 	for (auto& i : ConfVec(ignore_dir))
 	{
-		if (file_name==i)
+		if (file_name == i)
 		{
-			
 			return false;
 		}
 	}
@@ -76,7 +76,7 @@ bool CheckLang(MyString file_name)
 	return false;
 };
 
-void CalcLineNum(MyString file_name)
+auto CalcLineNum(MyString file_name)
 {
 	fstream code_file(file_name, ios::in);
 	MyString code;
@@ -93,6 +93,7 @@ void CalcLineNum(MyString file_name)
 	{
 		cout << file_name << " " << num << endl;
 	}
+	return code;
 }
 
 void InitConf()
@@ -101,8 +102,12 @@ void InitConf()
 	{
 		auto item = x.Split("=", 1);
 		auto propetry = item[0].Trim();
-		auto value = item.size() == 1 ? "" : item[1].Trim();
-		conf[propetry] = value;
+		auto value = item.size() == 1 ? "" : item[1];
+		if (value.find("#")!=string::npos) // ·Ö¸î×¢ÊÍ
+		{
+			value = value.Split("#", 1)[0];
+		}
+		conf[propetry] = value.Trim();
 	}
 	for (auto& i : value_vec)
 	{
@@ -128,11 +133,11 @@ int ReadConfFile()
 	{
 		fstream create_new("conf.ini", ios::app);
 		create_new
-			<< lang << " = " << endl
-			<< dir << " = " << endl
-			<< ignore_dir << " = " << endl
-			<< detail << " = true";
-		cout << "ï¿½Ò²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½È½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" << endl;
+			<< lang << " =  # ·ûºÏÌõ¼þµÄºó×ºÃû" << endl
+			<< dir << " = # ËÑË÷ÎÄ¼þ¼Ð" << endl
+			<< ignore_dir << " = # ºöÂÔµÄÎÄ¼þ¼Ð" << endl
+			<< detail << " = true # Õ¹Ê¾Ï¸½Ú";
+		cout << "ÕÒ²»µ½ÅäÖÃÎÄ¼þ£¬ÒÑÐÂ½¨Ò»¸ö£¬ÏÈ½øÐÐÅäÖÃ" << endl;
 		return -1;
 	}
 	while (conf_file.good())
@@ -150,13 +155,15 @@ void CoutLine()
 
 int main()
 {
+	
 	if (ReadConfFile() == -1)
 	{
 		system("pause");;
 		return 0;
 	}
 	InitConf();
-
+	bool isExport = conf[export2file] != "";
+	MyString source;
 
 	function<void(MyString)> Find = [&](MyString filename)
 	{
@@ -185,7 +192,12 @@ int main()
 			{
 				MyString code_file = filename;
 				code_file.Replace("*", file_info.name);
-				CalcLineNum(code_file);
+				auto src = CalcLineNum(code_file);
+				if (isExport)
+				{
+					source += ("\n// exp-" + code_file + "-end\n");
+					source += src;
+				}
 			}
 			if (_findnext(handle, &file_info) == -1)
 			{
@@ -196,6 +208,10 @@ int main()
 	};
 	for (auto x : ConfVec(dir))
 	{
+		if (x=="")
+		{
+			continue;
+		}
 		if (ConfBool(detail))
 		{
 			CoutLine();
@@ -211,5 +227,11 @@ int main()
 		cout << i.first << "  " << i.second << endl;
 	}
 	cout << "all    " << all_num << endl;
+	if (isExport)
+	{
+		auto file_pos = conf[export2file];
+		ofstream exp_file(file_pos);
+		exp_file << source;
+	}
 	system("pause");
 }
